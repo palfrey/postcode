@@ -1,2 +1,8 @@
 bin
 gen
+*.apk
+.*.swp
+classes.dex
+bin-stamp
+.debug.keystore
+R.java
