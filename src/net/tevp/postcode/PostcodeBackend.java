@@ -1,4 +1,4 @@
-package net.tevp.Postcode;
+package net.tevp.postcode;
 
 import java.net.MalformedURLException;
 import java.net.URL;

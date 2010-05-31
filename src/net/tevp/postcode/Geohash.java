@@ -1,4 +1,4 @@
-package net.tevp.Postcode;
+package net.tevp.postcode;
 
 import java.util.BitSet;
 import java.util.HashMap;
