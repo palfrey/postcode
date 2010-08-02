@@ -65,6 +65,19 @@ public class PostcodeBackend implements LocationListener  {
 		return data;
 	}
 
+	private static String getGeonames(double lat, double lon) throws PostcodeException
+	{
+		String data = grabURL(String.format("http://ws.geonames.org/findNearbyPostalCodesJSON?lat=%.8f&lng=%.8f&maxRows=1",lat,lon));
+		try 
+		{
+			JSONObject js = new JSONObject(data);
+			return js.getJSONArray("postalCodes").getJSONObject(0).getString("postalCode");
+		}
+		catch (JSONException e) {
+			throw new PostcodeException("json issue", e);
+		}
+	}
+
 	static String get(double lat, double lon) throws PostcodeException
 	{
 		//return getUKPostcodes(lat,lon);
