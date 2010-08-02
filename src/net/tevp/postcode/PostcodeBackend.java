@@ -80,8 +80,31 @@ public class PostcodeBackend implements LocationListener  {
 
 	static String get(double lat, double lon) throws PostcodeException
 	{
-		//return getUKPostcodes(lat,lon);
-		return getWhatIsMyPostcode(lat,lon);
+		PostcodeException old = null;
+		int i=0;
+		while(true)
+		{
+			try
+			{
+				switch (i)
+				{
+					case 0:
+						return getGeonames(lat,lon);
+					case 1:
+						return getWhatIsMyPostcode(lat,lon);
+					case 2:
+						return getUKPostcodes(lat,lon);
+					default:
+						assert old != null;
+						throw old;
+				}
+			}
+			catch (PostcodeException pe)
+			{
+				old = pe;
+				i++;
+			}
+		}
 	}
 
 	static Vector<PostcodeListener> pls = null;
