@@ -4,7 +4,10 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     >
-<TextView  
-    android:layout_width="fill_parent" 
-    android:layout_height="wrap_content" android:text="test" android:id="@+id/Postcode"/>
+	<net.tevp.postcode.AutoScaledTextView  
+	android:layout_width="fill_parent"
+	android:layout_height="wrap_content"
+	android:layout_weight="1"
+	android:layout_gravity="center"
+    android:text="test" android:id="@+id/Postcode"/>
 </LinearLayout>
