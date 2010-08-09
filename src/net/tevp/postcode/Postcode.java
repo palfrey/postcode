@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.content.Context;
 import android.widget.TextView;
+import android.location.Location;
 
 public class Postcode extends Activity implements PostcodeListener {	
 	TextView tv;
@@ -14,11 +15,9 @@ public class Postcode extends Activity implements PostcodeListener {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
         tv = (TextView) findViewById(R.id.Postcode);
-        tv.setText("Postcode is unknown");
-
+        tv.setText("Finding location..");
 		new PostcodeBackend().getPostcode(this,this);
     }
-
 
 	public static void main(String[] args) throws Exception {
 		String[] coords = args[0].split(",");
@@ -30,5 +29,9 @@ public class Postcode extends Activity implements PostcodeListener {
 	{
 		tv.setText(postcode);
 	}
-}
 
+	public void updatedLocation(Location l)
+	{
+		tv.setText("Found location, looking for postcode...");
+	}
+}

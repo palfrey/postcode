@@ -110,6 +110,7 @@ public class PostcodeBackend implements LocationListener  {
 	static Vector<PostcodeListener> pls = null;
 	static String lastPostcode = null;
 
+
     public void getPostcode(Context context, final PostcodeListener callback)
 	{
 		Log.d(TAG, "Acquiring postcode from location");
@@ -146,6 +147,8 @@ public class PostcodeBackend implements LocationListener  {
 	public static void updatedLocation(Location l)
 	{
 		Log.d(TAG, "Got an updated location");
+		for (PostcodeListener pl: pls)
+			pl.updatedLocation(l);
 		try
 		{
 			lastPostcode = PostcodeBackend.get(l.getLatitude(),l.getLongitude());
