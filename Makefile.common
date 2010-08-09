@@ -21,6 +21,9 @@ all: $(TARGET_FULLNAME)
 install: $(TARGET_FULLNAME)
 	$(ANDROID)/tools/adb install -r $<
 
+uninstall:
+	$(ANDROID)/tools/adb uninstall $(PACKAGE)
+
 log:
 	$(ANDROID)/tools/adb logcat
 
