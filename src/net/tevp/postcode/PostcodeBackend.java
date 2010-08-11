@@ -116,19 +116,23 @@ public class PostcodeBackend implements LocationListener  {
 		Log.d(TAG, "Acquiring postcode from location");
 		if (pls == null)
 		{
-			LocationManager lm = (LocationManager)context.getSystemService(Context.LOCATION_SERVICE);
+			lm = (LocationManager)context.getSystemService(Context.LOCATION_SERVICE);
 			Criteria c = new Criteria();
-			String provider = lm.getBestProvider(c, false);
-			lm.requestLocationUpdates(provider, 1000, 200, this);
-			
+			Location l = null;
+			for(String provider: lm.getProviders(false))
+			{
+				lm.requestLocationUpdates(provider, 0, 0, this);
+				if (l == null)
+					l = lm.getLastKnownLocation(provider);
+			}
 			pls = new Vector<PostcodeListener>();
 			pls.add(callback);
 			
-			final Location l = lm.getLastKnownLocation(provider);
 			if (l!= null)
 			{
+				final Location l2 = l;
 				new Thread() { public void run() {
-					updatedLocation(l);
+					updatedLocation(l2);
 				}};
 			}
 		}
@@ -146,6 +150,7 @@ public class PostcodeBackend implements LocationListener  {
 
 	public void updatedLocation(Location l)
 	{
+		lm.removeUpdates(this);
 		Log.d(TAG, "Got an updated location");
 		for (PostcodeListener pl: pls)
 			pl.updatedLocation(l);
