@@ -25,13 +25,25 @@ public class Postcode extends Activity implements PostcodeListener {
 		System.out.println(PostcodeBackend.get(Double.parseDouble(coords[0]),Double.parseDouble(coords[1])));
 	}
 
+	private void setText(final String text)
+	{
+		final TextView myTV = tv;		
+		runOnUiThread(new Runnable()
+		{
+			public void run()
+			{
+				myTV.setText(text);
+			}
+		});
+	}
+
 	public void postcodeChange(String postcode)
 	{
-		tv.setText(postcode);
+		setText(postcode);
 	}
 
 	public void updatedLocation(Location l)
 	{
-		tv.setText("Found location, looking for postcode...");
+		setText("Found location, looking for postcode...");
 	}
 }

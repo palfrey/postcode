@@ -131,9 +131,10 @@ public class PostcodeBackend implements LocationListener  {
 			if (l!= null)
 			{
 				final Location l2 = l;
-				new Thread() { public void run() {
+				Thread t = new Thread() { public void run() {
 					updatedLocation(l2);
 				}};
+				t.start();
 			}
 		}
 		else
@@ -141,9 +142,10 @@ public class PostcodeBackend implements LocationListener  {
 			pls.add(callback);
 			if (lastPostcode != null)
 			{
-				new Thread() { public void run() {
+				Thread t = new Thread() { public void run() {
 					callback.postcodeChange(lastPostcode);
 				}};
+				t.start();
 			}
 		}
 	}
@@ -159,7 +161,7 @@ public class PostcodeBackend implements LocationListener  {
 			lastPostcode = PostcodeBackend.get(l.getLatitude(),l.getLongitude());
 			Log.d(TAG, "Postcode is "+lastPostcode);
 			Log.d(TAG, "Have "+Integer.toString(pls.size())+" postcode listeners");
-			for (final PostcodeListener pl: pls)
+			for (PostcodeListener pl: pls)
 			{
 				pl.postcodeChange(lastPostcode);
 			}
