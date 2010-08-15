@@ -5,6 +5,8 @@ import android.os.Bundle;
 import android.content.Context;
 import android.widget.TextView;
 import android.location.Location;
+import android.widget.Button;
+import android.view.View;
 
 public class Postcode extends Activity implements PostcodeListener {	
 	TextView tv;
@@ -21,6 +23,14 @@ public class Postcode extends Activity implements PostcodeListener {
 		if (pb == null)
 			pb = new PostcodeBackend();
 		pb.getPostcode(this,this);
+
+		final Postcode self = this;
+		((Button) findViewById(R.id.btnUpdate)).setOnClickListener(new View.OnClickListener() {
+			public void onClick(View v) {
+				self.pb = new PostcodeBackend();
+				self.pb.getPostcode(self,self);
+			}
+		});
     }
 
 	public static void main(String[] args) throws Exception {
