@@ -29,6 +29,7 @@ public class Postcode extends Activity implements PostcodeListener {
 			public void onClick(View v) {
 				self.pb = new PostcodeBackend();
 				self.pb.getPostcode(self,self);
+        		self.setText("Finding location..");
 			}
 		});
     }
