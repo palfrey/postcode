@@ -8,6 +8,7 @@ import android.location.Location;
 
 public class Postcode extends Activity implements PostcodeListener {	
 	TextView tv;
+	PostcodeBackend pb;
 	
 	/** Called when the activity is first created. */
     @Override
@@ -16,7 +17,10 @@ public class Postcode extends Activity implements PostcodeListener {
         setContentView(R.layout.main);
         tv = (TextView) findViewById(R.id.Postcode);
         tv.setText("Finding location..");
-		new PostcodeBackend().getPostcode(this,this);
+		pb = (PostcodeBackend) getLastNonConfigurationInstance();
+		if (pb == null)
+			pb = new PostcodeBackend();
+		pb.getPostcode(this,this);
     }
 
 	public static void main(String[] args) throws Exception {
@@ -45,5 +49,11 @@ public class Postcode extends Activity implements PostcodeListener {
 	public void updatedLocation(Location l)
 	{
 		setText("Found location, looking for postcode...");
+	}
+
+	@Override
+	public Object onRetainNonConfigurationInstance()
+	{
+		return pb;
 	}
 }
