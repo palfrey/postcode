@@ -123,7 +123,11 @@ public class PostcodeBackend implements LocationListener  {
 			{
 				lm.requestLocationUpdates(provider, 0, 0, this);
 				if (l == null)
+				{
 					l = lm.getLastKnownLocation(provider);
+					if (((System.currentTimeMillis()-l.getTime())/1000.0) > 60*60) // > 1 minute old
+						l = null;
+				}
 			}
 			pls = new Vector<PostcodeListener>();
 			pls.add(callback);
