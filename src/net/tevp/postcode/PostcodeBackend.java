@@ -125,7 +125,7 @@ public class PostcodeBackend implements LocationListener  {
 				if (l == null)
 				{
 					l = lm.getLastKnownLocation(provider);
-					if (((System.currentTimeMillis()-l.getTime())/1000.0) > 60*60) // > 1 minute old
+					if (((System.currentTimeMillis()-l.getTime())/1000.0) > 60) // > 1 minute old
 						l = null;
 				}
 			}
@@ -177,6 +177,8 @@ public class PostcodeBackend implements LocationListener  {
 	}
 
 	public void onLocationChanged(Location l){
+		if (((System.currentTimeMillis()-l.getTime())/1000.0) > 60) // > 1 minute old
+			return;
 		updatedLocation(l);
 	}
 
