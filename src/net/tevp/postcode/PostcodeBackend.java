@@ -153,6 +153,8 @@ public class PostcodeBackend implements LocationListener  {
 
 	public void updatedLocation(Location l)
 	{
+		if (pls == null)
+			return;
 		lm.removeUpdates(this);
 		Log.d(TAG, "Got an updated location");
 		for (PostcodeListener pl: pls)
