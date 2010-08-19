@@ -18,7 +18,6 @@ public class Postcode extends Activity implements PostcodeListener {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
         tv = (TextView) findViewById(R.id.Postcode);
-        tv.setText("Finding location..");
 
 		pb = (PostcodeBackend) getLastNonConfigurationInstance();
 		if (pb == null)
@@ -29,13 +28,13 @@ public class Postcode extends Activity implements PostcodeListener {
 		((Button) findViewById(R.id.btnUpdate)).setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
 				self.newPostcode(true);
-        		self.setText("Finding location..");
 			}
 		});
     }
 
 	private void newPostcode(boolean mustBeNew)
 	{
+		setText("Finding location..");
 		pb.getPostcode(this,this,mustBeNew);
 	}
 
