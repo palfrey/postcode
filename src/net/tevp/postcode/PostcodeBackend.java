@@ -7,7 +7,7 @@ import java.io.InputStream;
 
 import org.json.*;
 import android.location.*;
-import java.util.Vector;
+import java.util.HashSet;
 import android.os.Bundle;
 import android.content.Context;
 import android.util.Log;
@@ -15,6 +15,7 @@ import android.util.Log;
 public class PostcodeBackend implements LocationListener  {	
 	public static final String TAG = "PostcodeBackend";
     static Geohash e = new Geohash();
+	Location last = null;
     
 	private static String grabURL(String url) throws PostcodeException
 	{
@@ -89,9 +90,9 @@ public class PostcodeBackend implements LocationListener  {
 				switch (i)
 				{
 					case 0:
-						return getGeonames(lat,lon);
-					case 1:
 						return getWhatIsMyPostcode(lat,lon);
+					case 1:
+						return getGeonames(lat,lon);
 					case 2:
 						return getUKPostcodes(lat,lon);
 					default:
@@ -107,50 +108,46 @@ public class PostcodeBackend implements LocationListener  {
 		}
 	}
 
-	Vector<PostcodeListener> pls = null;
+	HashSet<PostcodeListener> pls = null;
 	String lastPostcode = null;
 	LocationManager lm;
 
     public void getPostcode(Context context, final PostcodeListener callback)
 	{
+    	getPostcode(context, callback, false);
+	}
+
+    public void getPostcode(Context context, final PostcodeListener callback, boolean mustBeNew)
+	{
 		Log.d(TAG, "Acquiring postcode from location");
-		if (pls == null)
+		lm = (LocationManager)context.getSystemService(Context.LOCATION_SERVICE);
+		Criteria c = new Criteria();
+		Location l = null;
+		for(String provider: lm.getProviders(false))
 		{
-			lm = (LocationManager)context.getSystemService(Context.LOCATION_SERVICE);
-			Criteria c = new Criteria();
-			Location l = null;
-			for(String provider: lm.getProviders(false))
+			if (l == null && !mustBeNew)
 			{
-				lm.requestLocationUpdates(provider, 0, 0, this);
-				if (l == null)
+				l = lm.getLastKnownLocation(provider);
+				if (((System.currentTimeMillis()-l.getTime())/1000.0) > 60) // > 1 minute old
 				{
-					l = lm.getLastKnownLocation(provider);
-					if (((System.currentTimeMillis()-l.getTime())/1000.0) > 60) // > 1 minute old
-						l = null;
+					Log.d(TAG, "Got old data from "+provider);
+					l = null;
 				}
 			}
-			pls = new Vector<PostcodeListener>();
-			pls.add(callback);
-			
-			if (l!= null)
-			{
-				final Location l2 = l;
-				Thread t = new Thread() { public void run() {
-					updatedLocation(l2);
-				}};
-				t.start();
-			}
+			if (l == null)
+				lm.requestLocationUpdates(provider, 0, 0, this);
 		}
-		else
+		if (pls == null)
+			pls = new HashSet<PostcodeListener>();
+		pls.add(callback);
+			
+		if (l!= null)
 		{
-			pls.add(callback);
-			if (lastPostcode != null)
-			{
-				Thread t = new Thread() { public void run() {
-					callback.postcodeChange(lastPostcode);
-				}};
-				t.start();
-			}
+			final Location l2 = l;
+			Thread t = new Thread() { public void run() {
+				updatedLocation(l2);
+			}};
+			t.start();
 		}
 	}
 
@@ -162,13 +159,16 @@ public class PostcodeBackend implements LocationListener  {
 			pl.updatedLocation(l);
 		try
 		{
-			lastPostcode = PostcodeBackend.get(l.getLatitude(),l.getLongitude());
+			if (last == null || lastPostcode == null || l.getLatitude()!=last.getLatitude() || l.getLongitude() != last.getLongitude())
+				lastPostcode = PostcodeBackend.get(l.getLatitude(),l.getLongitude());
+			last = l;
 			Log.d(TAG, "Postcode is "+lastPostcode);
 			Log.d(TAG, "Have "+Integer.toString(pls.size())+" postcode listeners");
 			for (PostcodeListener pl: pls)
 			{
 				pl.postcodeChange(lastPostcode);
 			}
+			pls = null;
 		}
 		catch(PostcodeException pe)
 		{

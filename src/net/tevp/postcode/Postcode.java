@@ -19,20 +19,32 @@ public class Postcode extends Activity implements PostcodeListener {
         setContentView(R.layout.main);
         tv = (TextView) findViewById(R.id.Postcode);
         tv.setText("Finding location..");
+
 		pb = (PostcodeBackend) getLastNonConfigurationInstance();
 		if (pb == null)
 			pb = new PostcodeBackend();
-		pb.getPostcode(this,this);
+		newPostcode(false);
 
 		final Postcode self = this;
 		((Button) findViewById(R.id.btnUpdate)).setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
-				self.pb = new PostcodeBackend();
-				self.pb.getPostcode(self,self);
+				self.newPostcode(true);
         		self.setText("Finding location..");
 			}
 		});
     }
+
+	private void newPostcode(boolean mustBeNew)
+	{
+		pb.getPostcode(this,this,mustBeNew);
+	}
+
+	@Override
+	protected void onResume()
+	{
+		super.onResume();
+		newPostcode(false);
+	}
 
 	public static void main(String[] args) throws Exception {
 		String[] coords = args[0].split(",");
