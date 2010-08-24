@@ -131,7 +131,7 @@ public class PostcodeBackend implements LocationListener  {
 			if (l == null && !mustBeNew)
 			{
 				l = lm.getLastKnownLocation(provider);
-				if (((System.currentTimeMillis()-l.getTime())/1000.0) > 60) // > 1 minute old
+				if (l!=null && ((System.currentTimeMillis()-l.getTime())/1000.0) > 60) // > 1 minute old
 				{
 					Log.d(TAG, "Got old data from "+provider);
 					l = null;
