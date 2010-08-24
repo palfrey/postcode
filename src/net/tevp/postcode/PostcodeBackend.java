@@ -11,6 +11,7 @@ import java.util.HashSet;
 import android.os.Bundle;
 import android.content.Context;
 import android.util.Log;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class PostcodeBackend implements LocationListener  {	
 	public static final String TAG = "PostcodeBackend";
@@ -109,6 +110,8 @@ public class PostcodeBackend implements LocationListener  {
 	}
 
 	HashSet<PostcodeListener> pls = null;
+	private final ReentrantLock plsLock = new ReentrantLock();
+
 	String lastPostcode = null;
 	LocationManager lm;
 
@@ -137,9 +140,18 @@ public class PostcodeBackend implements LocationListener  {
 			if (l == null)
 				lm.requestLocationUpdates(provider, 0, 0, this);
 		}
-		if (pls == null)
-			pls = new HashSet<PostcodeListener>();
-		pls.add(callback);
+
+		plsLock.lock();
+		try
+		{
+			if (pls == null)
+				pls = new HashSet<PostcodeListener>();
+			pls.add(callback);
+		}
+		finally
+		{
+			plsLock.unlock();
+		}
 			
 		if (l!= null)
 		{
@@ -151,13 +163,26 @@ public class PostcodeBackend implements LocationListener  {
 		}
 	}
 
+
 	public void updatedLocation(Location l)
 	{
-		if (pls == null)
+		HashSet<PostcodeListener> myPls = null;
+		plsLock.lock();
+		try
+		{
+			myPls = pls;
+			pls = null;
+		}
+		finally
+		{
+			plsLock.unlock();
+		}
+		if (myPls == null)
 			return;
+
 		lm.removeUpdates(this);
 		Log.d(TAG, "Got an updated location");
-		for (PostcodeListener pl: pls)
+		for (PostcodeListener pl: myPls)
 			pl.updatedLocation(l);
 		try
 		{
@@ -165,12 +190,11 @@ public class PostcodeBackend implements LocationListener  {
 				lastPostcode = PostcodeBackend.get(l.getLatitude(),l.getLongitude());
 			last = l;
 			Log.d(TAG, "Postcode is "+lastPostcode);
-			Log.d(TAG, "Have "+Integer.toString(pls.size())+" postcode listeners");
-			for (PostcodeListener pl: pls)
+			Log.d(TAG, "Have "+Integer.toString(myPls.size())+" postcode listeners");
+			for (PostcodeListener pl: myPls)
 			{
 				pl.postcodeChange(lastPostcode);
 			}
-			pls = null;
 		}
 		catch(PostcodeException pe)
 		{
