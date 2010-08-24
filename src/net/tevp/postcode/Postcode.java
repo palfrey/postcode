@@ -11,6 +11,7 @@ import android.view.View;
 public class Postcode extends Activity implements PostcodeListener {	
 	TextView tv;
 	PostcodeBackend pb;
+	String lastPostcode = null;
 	
 	/** Called when the activity is first created. */
     @Override
@@ -34,7 +35,10 @@ public class Postcode extends Activity implements PostcodeListener {
 
 	private void newPostcode(boolean mustBeNew)
 	{
-		setText("Finding location..");
+		if (lastPostcode!= null)
+			setText(lastPostcode+"\n(updating...)");
+		else
+			setText("Finding location..");
 		pb.getPostcode(this,this,mustBeNew);
 	}
 
@@ -65,12 +69,16 @@ public class Postcode extends Activity implements PostcodeListener {
 
 	public void postcodeChange(String postcode)
 	{
+		lastPostcode = postcode;
 		setText(postcode);
 	}
 
 	public void updatedLocation(Location l)
 	{
-		setText("Found location, looking for postcode...");
+		if (lastPostcode!= null)
+			setText(lastPostcode+"\nFound new location, looking for postcode...");
+		else
+			setText("Found location, looking for postcode...");
 	}
 
 	@Override
