@@ -203,6 +203,8 @@ public class PostcodeBackend implements LocationListener  {
 	}
 
 	public void onLocationChanged(Location l){
+		if (!l.hasAccuracy() || l.getAccuracy() > 200) // want only items accurate to <200m
+			return;
 		if (((System.currentTimeMillis()-l.getTime())/1000.0) > 60) // > 1 minute old
 			return;
 		updatedLocation(l);
