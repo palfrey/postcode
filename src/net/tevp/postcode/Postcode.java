@@ -81,6 +81,11 @@ public class Postcode extends Activity implements PostcodeListener {
 			setText("Found location, looking for postcode...");
 	}
 
+	public void locationFindFail()
+	{
+		setText("Can't find location. Enable GPS, or wait until you're outside");
+	}
+
 	public void postcodeLookupFail()
 	{
 		setText("Failed to lookup postcode. Please check you've got a working internet connection");

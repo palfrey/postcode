@@ -4,19 +4,23 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.concurrent.locks.ReentrantLock;
+import java.util.HashSet;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import org.json.*;
 import android.location.*;
-import java.util.HashSet;
 import android.os.Bundle;
 import android.content.Context;
 import android.util.Log;
-import java.util.concurrent.locks.ReentrantLock;
 
 public class PostcodeBackend implements LocationListener  {	
 	public static final String TAG = "PostcodeBackend";
     static Geohash e = new Geohash();
 	Location last = null;
+	static Timer timer = new Timer(true);
+	TimerTask ttLocator = null;
     
 	private static String grabURL(String url) throws PostcodeException
 	{
@@ -122,6 +126,21 @@ public class PostcodeBackend implements LocationListener  {
 
     public void getPostcode(Context context, final PostcodeListener callback, boolean mustBeNew)
 	{
+		final PostcodeBackend self = this;
+		ttLocator = new TimerTask() {
+			public void run()
+			{
+				lm.removeUpdates(self);
+				HashSet<PostcodeListener> myPls = getListeners();
+				if (myPls == null)
+					return;
+				for (PostcodeListener pl: myPls)
+					pl.locationFindFail();
+			}
+		};
+		
+		timer.schedule(ttLocator, 1000 * 60); // 1 minute before we give up
+		
 		Log.d(TAG, "Acquiring postcode from location");
 		lm = (LocationManager)context.getSystemService(Context.LOCATION_SERVICE);
 		Criteria c = new Criteria();
@@ -163,7 +182,7 @@ public class PostcodeBackend implements LocationListener  {
 		}
 	}
 
-	public void updatedLocation(Location l)
+	public HashSet<PostcodeListener> getListeners()
 	{
 		HashSet<PostcodeListener> myPls = null;
 		plsLock.lock();
@@ -176,10 +195,21 @@ public class PostcodeBackend implements LocationListener  {
 		{
 			plsLock.unlock();
 		}
+		return myPls;
+	}
+
+	public void updatedLocation(Location l)
+	{
+		HashSet<PostcodeListener> myPls = getListeners();
 		if (myPls == null)
 			return;
 
 		lm.removeUpdates(this);
+		if (ttLocator != null)
+		{
+			ttLocator.cancel();
+			ttLocator = null;
+		}
 		Log.d(TAG, "Got an updated location");
 		for (PostcodeListener pl: myPls)
 			pl.updatedLocation(l);
