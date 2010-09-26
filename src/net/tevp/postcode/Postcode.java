@@ -81,6 +81,11 @@ public class Postcode extends Activity implements PostcodeListener {
 			setText("Found location, looking for postcode...");
 	}
 
+	public void postcodeLookupFail()
+	{
+		setText("Failed to lookup postcode. Please check you've got a working internet connection");
+	}
+
 	@Override
 	public Object onRetainNonConfigurationInstance()
 	{

@@ -163,7 +163,6 @@ public class PostcodeBackend implements LocationListener  {
 		}
 	}
 
-
 	public void updatedLocation(Location l)
 	{
 		HashSet<PostcodeListener> myPls = null;
@@ -184,21 +183,26 @@ public class PostcodeBackend implements LocationListener  {
 		Log.d(TAG, "Got an updated location");
 		for (PostcodeListener pl: myPls)
 			pl.updatedLocation(l);
+
 		try
 		{
 			if (last == null || lastPostcode == null || l.getLatitude()!=last.getLatitude() || l.getLongitude() != last.getLongitude())
 				lastPostcode = PostcodeBackend.get(l.getLatitude(),l.getLongitude());
-			last = l;
-			Log.d(TAG, "Postcode is "+lastPostcode);
-			Log.d(TAG, "Have "+Integer.toString(myPls.size())+" postcode listeners");
-			for (PostcodeListener pl: myPls)
-			{
-				pl.postcodeChange(lastPostcode);
-			}
 		}
 		catch(PostcodeException pe)
 		{
 			Log.e(TAG, "Parse error during new postcode", pe);
+			for (PostcodeListener pl: myPls)
+				pl.postcodeLookupFail();
+			return;
+		}
+
+		last = l;
+		Log.d(TAG, "Postcode is "+lastPostcode);
+		Log.d(TAG, "Have "+Integer.toString(myPls.size())+" postcode listeners");
+		for (PostcodeListener pl: myPls)
+		{
+			pl.postcodeChange(lastPostcode);
 		}
 	}
 

@@ -6,4 +6,6 @@ public interface PostcodeListener
 {
 	public void postcodeChange(String postcode);
 	public void updatedLocation(Location l);
+
+	public void postcodeLookupFail();
 }
