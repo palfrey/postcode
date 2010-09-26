@@ -31,11 +31,8 @@ $(TARGET_FULLNAME): $(TARGET)_unaligned.apk
 	rm -f $@
 	$(ANDROID)/tools/zipalign 4 $< $@
 
-$(KEYSTORE):
-	keytool -genkeypair -keystore $(KEYSTORE) -validity 730 -keypass android -storepass android -dname "CN=Android Debug,O=Android,C=UK"
-
 $(TARGET)_unaligned.apk: $(TARGET)_unsigned.apk $(KEYSTORE)
-	jarsigner -keystore $(KEYSTORE) -storepass android -signedjar $@ $< mykey
+	jarsigner -keystore $(KEYSTORE) -signedjar $@ $< mykey
 
 $(TARGET)_unsigned.apk: classes.dex resources.apk
 	$(ANDROID)/tools/apkbuilder $@ -u -f $< -z resources.apk -rf src -v
