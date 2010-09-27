@@ -68,6 +68,8 @@ public class PostcodeBackend implements LocationListener  {
 	{
 		String s = e.encode(lat, lon);
 		String data = grabURL("http://whatismypostcode.appspot.com/"+s);
+		if (data.compareTo("Unknown location")==0)
+			throw new PostcodeException("unknown location");
 		return data;
 	}
 
