@@ -249,5 +249,10 @@ public class PostcodeBackend implements LocationListener  {
 	public void onProviderDisabled(String provider) {}
 	public void onProviderEnabled(String provider) {}
 	public void onStatusChanged(String provider, int status, Bundle extras) {}
+
+	public static void main (String args[]) throws Exception
+	{
+		System.out.println(new PostcodeBackend().get(Double.valueOf(args[0]), Double.valueOf(args[1])));
+	}
 }
 

@@ -11,3 +11,7 @@ R_PATH = src/net/tevp/postcode/R.java
 SOURCE_FILES=$(wildcard src/net/tevp/*/*.java)
 
 include Makefile.common
+
+test: $(BIN_FILES)
+	java -cp bin:json.jar:$(PLATFORM_PATH)/android.jar net.tevp.postcode.PostcodeBackend 42.569261 -71.268311
+
