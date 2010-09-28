@@ -51,8 +51,28 @@ public class PostcodeBackend implements LocationListener  {
 		return new String(out, 0, sofar);
 	}
 
+	/* eliminate a few locations that definitely aren't in the UK */
+	private static boolean definitelyNotInUK(double lat, double lon)
+	{
+		/* These are overestimates for the UK bounding box, based on clicking
+		 * on locations in Google Maps. Anything not in this box definitely
+		 * isn't in the UK, so don't check UK-only services
+		 */
+		final double bottom = -11.074219;
+		final double left = 49.310799;
+		final double top = 2.680664;
+		final double right = 60.866312;
+
+		if (lat > right || lat < left || lon > top || lon < bottom)
+			return true;
+		else
+			return false;
+	}
+
 	private static String getUKPostcodes(double lat, double lon) throws PostcodeException
 	{
+		if (definitelyNotInUK(lat, lon))
+			throw new PostcodeException("non-UK location");
 		String data = grabURL(String.format("http://www.uk-postcodes.com/latlng/%.8f,%.8f.json",lat,lon));
 		try 
 		{
@@ -66,6 +86,8 @@ public class PostcodeBackend implements LocationListener  {
 
 	private static String getWhatIsMyPostcode(double lat, double lon) throws PostcodeException
 	{
+		if (definitelyNotInUK(lat, lon))
+			throw new PostcodeException("non-UK location");
 		String s = e.encode(lat, lon);
 		String data = grabURL("http://whatismypostcode.appspot.com/"+s);
 		if (data.compareTo("Unknown location")==0)
