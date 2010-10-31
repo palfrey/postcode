@@ -16,15 +16,16 @@ public class Postcode extends Activity implements PostcodeListener {
 	PostcodeBackend pb;
 	String lastPostcode = null;
 	PostcodeState ps = null;
+	boolean acquiring = false;
 
 	private class PostcodeState
 	{
 		public PostcodeBackend pb;
 		public String text;
 		public Date timestamp;
+		public boolean acquiring;
 	}
 
-	
 	/** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -47,6 +48,7 @@ public class Postcode extends Activity implements PostcodeListener {
 			setText(lastPostcode+"\n(updating...)");
 		else
 			setText("Finding location..");
+		acquiring = true;
 		pb.getPostcode(this,this,mustBeNew);
 	}
 
@@ -60,6 +62,7 @@ public class Postcode extends Activity implements PostcodeListener {
 			pb = ps.pb;
 		
 		if (ps == null
+				|| ps.acquiring
 				|| (new Date().getTime()-ps.timestamp.getTime()) > 300 * 1000 // more than 5 minutes old
 				)
 			newPostcode(false);
@@ -89,6 +92,7 @@ public class Postcode extends Activity implements PostcodeListener {
 	{
 		lastPostcode = postcode;
 		setText(String.format("%s\n(@ %s)", postcode, new SimpleDateFormat("HH:mm:ss").format(new Date())));
+		acquiring = false;
 	}
 
 	public void updatedLocation(Location l)
@@ -101,11 +105,13 @@ public class Postcode extends Activity implements PostcodeListener {
 
 	public void locationFindFail()
 	{
+		acquiring = false;
 		setText("Can't find location. Enable GPS, or wait until you're outside");
 	}
 
 	public void postcodeLookupFail()
 	{
+		acquiring = false;
 		setText("Failed to lookup postcode. Please check you've got a working internet connection");
 	}
 
@@ -116,6 +122,7 @@ public class Postcode extends Activity implements PostcodeListener {
 		ps.pb = pb;
 		ps.text = tv.getText().toString();
 		ps.timestamp = new Date();
+		ps.acquiring = acquiring;
 		return ps;
 	}
 }
