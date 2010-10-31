@@ -13,6 +13,11 @@
 	<Button
 	android:layout_width="fill_parent"
 	android:layout_height="wrap_content"
+	android:text="Copy postcode"
+	android:id="@+id/btnCopyPostcode" />
+	<Button
+	android:layout_width="fill_parent"
+	android:layout_height="wrap_content"
 	android:text="Update postcode"
 	android:id="@+id/btnUpdate" />
 </LinearLayout>

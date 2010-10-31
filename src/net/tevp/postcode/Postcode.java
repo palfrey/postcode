@@ -7,8 +7,10 @@ import android.widget.TextView;
 import android.location.Location;
 import android.widget.Button;
 import android.view.View;
-import java.text.SimpleDateFormat;
+import android.widget.Toast;
+import android.text.ClipboardManager;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class Postcode extends Activity implements PostcodeListener {	
@@ -41,7 +43,25 @@ public class Postcode extends Activity implements PostcodeListener {
 				self.newPostcode(true);
 			}
 		});
-    }
+   		((Button) findViewById(R.id.btnCopyPostcode)).setOnClickListener(new View.OnClickListener() {
+			public void onClick(View v) {
+				if (self.lastPostcode == null)
+					self.toastText("Don't yet have a postcode!");
+				else
+				{
+					ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE); 
+					clipboard.setText(self.lastPostcode);
+					self.toastText("Copied postcode to clipboard");
+				}
+			}
+		});
+	}
+
+	private void toastText(String text)
+	{
+		Context context = getApplicationContext();
+		Toast.makeText(context, text, Toast.LENGTH_SHORT).show();
+	}
 
 	private void newPostcode(boolean mustBeNew)
 	{
