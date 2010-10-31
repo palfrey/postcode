@@ -9,6 +9,7 @@ import android.text.TextPaint;
 import android.util.Log;
 import android.graphics.Rect;
 import android.widget.LinearLayout;
+import android.text.Layout;
 
 public class AutoScaledTextView extends TextView implements TextWatcher
 {
@@ -26,34 +27,51 @@ public class AutoScaledTextView extends TextView implements TextWatcher
 			return;
 		Log.d(TAG, "calculating font size");
 
+		// FIXME: the String version ignores markup
+		// CharSequence text = getText();
+		
 		String text = getText().toString();
 		Log.d(TAG, String.format("text is '%s'", text));
+		
 		Rect bounds = new Rect();	
 		TextPaint tp = getPaint();
-		tp.getTextBounds(text, 0, text.length(), bounds);
-		int height = -bounds.top;
-		int width = bounds.right;
-		Log.d(TAG, String.format("Bounds bottom-top is %d, %d", bounds.bottom, bounds.top));
-		Log.d(TAG, String.format("Bounds right-left is %d, %d", bounds.right, bounds.left));
-		double fudge = 0.95;
-		double scale = (getWidth()/(width*1.0)) * fudge;
-		Log.d(TAG, String.format("Scale is %f", scale));
-		Log.d(TAG, String.format("Font size: old %f, new %f", getTextSize(), getTextSize()*scale));
-		setTextSize((int)(getTextSize()*scale));
-		
-		tp.getTextBounds(text, 0, text.length(), bounds);
-		Log.d(TAG, String.format("Bounds bottom-top is %d, %d", bounds.bottom, bounds.top));
-		Log.d(TAG, String.format("Bounds right-left is %d, %d", bounds.right, bounds.left));
-		int newHeight = (int)(height*scale);
-		if (getHeight()<newHeight)
+		int attempts = 0;
+		while (true)
 		{
-			Log.d(TAG, String.format("Setting height to %d, old height is %d", newHeight, getHeight()));
-			//setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.FILL_PARENT, newHeight));
-			getLayoutParams().height = newHeight;
-			/*setMinimumHeight(newHeight);
-			setHeight(newHeight);*/
+			int totalHeight = 0;
+			int maxWidth = 0;
+			/* getTextBounds doesn't seem to cope with newlines properly */
+			for(String s: text.split("\n"))
+			{
+				tp.getTextBounds(s, 0, s.length(), bounds);
+				int height = bounds.bottom-bounds.top;
+				int width = bounds.right-bounds.left;
+				if (width > maxWidth)
+					maxWidth = width;
+				if (totalHeight != 0)
+					totalHeight += tp.getFontSpacing();
+				totalHeight += height;
+			}
+			Log.d(TAG, String.format("Text w,h = %d, %d", maxWidth, totalHeight));
+			Log.d(TAG, String.format("View w,h = %d, %d", getWidth(), getHeight()));
+			double fudge = 0.95;
+			double scale = (getWidth()/(maxWidth*1.0)) * fudge;
+			double heightScale = (getHeight()/(totalHeight*1.0)) * fudge;
+			if (getHeight() < totalHeight)
+			{
+				scale = heightScale;
+				Log.d(TAG, "using heightScale");
+			}
+			Log.d(TAG, String.format("Scale is %f, %f", scale, heightScale));
+			Log.d(TAG, String.format("Font size: old %f, new %f", getTextSize(), getTextSize()*scale));
+			double fontdiff = Math.abs(getTextSize()-(getTextSize()*scale));
+			if (fontdiff<.5)
+				break;
+			setTextSize(Math.round(getTextSize()*scale));
 			requestLayout();
-			Log.d(TAG, String.format("Revised height: %d", getHeight()));
+			attempts +=1;
+			if (attempts > 5)
+				break;
 		}
 	}
 
