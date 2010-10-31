@@ -32,10 +32,17 @@ $(TARGET_FULLNAME): $(TARGET)_unaligned.apk
 	$(ANDROID)/tools/zipalign 4 $< $@
 
 $(TARGET)_unaligned.apk: $(TARGET)_unsigned.apk $(KEYSTORE)
+ifeq ($(KEYSTORE),.debug.keystore)
+	jarsigner -keystore $(KEYSTORE) -storepass android -signedjar $@ $< mykey
+else
 	jarsigner -keystore $(KEYSTORE) -signedjar $@ $< mykey
+endif
 
 $(TARGET)_unsigned.apk: classes.dex resources.apk
 	$(ANDROID)/tools/apkbuilder $@ -u -f $< -z resources.apk -rf src -v
+
+.debug.keystore:
+	keytool -genkeypair -keystore .debug.keystore -validity 730 -keypass android -storepass android -dname "CN=Android Debug,O=Android,C=UK"
 
 # to raise the memory limit, add -JXmx512M
 classes.dex: bin-stamp
