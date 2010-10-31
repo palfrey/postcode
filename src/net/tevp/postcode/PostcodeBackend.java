@@ -73,7 +73,7 @@ public class PostcodeBackend implements LocationListener  {
 	private static String getUKPostcodes(double lat, double lon) throws PostcodeException
 	{
 		if (definitelyNotInUK(lat, lon))
-			throw new PostcodeException("non-UK location");
+			throw new NonUKLocation();
 		String data = grabURL(String.format("http://www.uk-postcodes.com/latlng/%.8f,%.8f.json",lat,lon));
 		try 
 		{
@@ -88,7 +88,7 @@ public class PostcodeBackend implements LocationListener  {
 	private static String getWhatIsMyPostcode(double lat, double lon) throws PostcodeException
 	{
 		if (definitelyNotInUK(lat, lon))
-			throw new PostcodeException("non-UK location");
+			throw new NonUKLocation();
 		String s = e.encode(lat, lon);
 		String data = grabURL("http://whatismypostcode.appspot.com/"+s);
 		if (data.compareTo("Unknown location")==0)
@@ -126,9 +126,13 @@ public class PostcodeBackend implements LocationListener  {
 					case 2:
 						return getUKPostcodes(lat,lon);
 					default:
-						assert old != null;
-						throw old;
+						break;
 				}
+				break;
+			}
+			catch (NonUKLocation ue)
+			{
+				i++;
 			}
 			catch (PostcodeException pe)
 			{
@@ -136,6 +140,10 @@ public class PostcodeBackend implements LocationListener  {
 				i++;
 			}
 		}
+		if (old == null)
+			throw new PostcodeException("Failed to get postcode");
+		else
+			throw old;
 	}
 
 	HashSet<PostcodeListener> pls = null;
