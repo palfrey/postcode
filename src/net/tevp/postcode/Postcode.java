@@ -21,6 +21,7 @@ public class Postcode extends Activity implements PostcodeListener {
 	private class PostcodeState
 	{
 		public PostcodeBackend pb;
+		public String lastPostcode;
 		public String text;
 		public Date timestamp;
 		public boolean acquiring;
@@ -67,7 +68,10 @@ public class Postcode extends Activity implements PostcodeListener {
 				)
 			newPostcode(false);
 		else
+		{
+			lastPostcode = ps.lastPostcode;
 			setText(ps.text);
+		}
 	}
 
 	public static void main(String[] args) throws Exception {
@@ -123,6 +127,7 @@ public class Postcode extends Activity implements PostcodeListener {
 		ps.text = tv.getText().toString();
 		ps.timestamp = new Date();
 		ps.acquiring = acquiring;
+		ps.lastPostcode = lastPostcode;
 		return ps;
 	}
 }
