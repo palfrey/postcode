@@ -7,11 +7,23 @@ import android.widget.TextView;
 import android.location.Location;
 import android.widget.Button;
 import android.view.View;
+import java.text.SimpleDateFormat;
+
+import java.util.Date;
 
 public class Postcode extends Activity implements PostcodeListener {	
 	TextView tv;
 	PostcodeBackend pb;
 	String lastPostcode = null;
+	PostcodeState ps = null;
+
+	private class PostcodeState
+	{
+		public PostcodeBackend pb;
+		public String text;
+		public Date timestamp;
+	}
+
 	
 	/** Called when the activity is first created. */
     @Override
@@ -20,11 +32,7 @@ public class Postcode extends Activity implements PostcodeListener {
         setContentView(R.layout.main);
         tv = (TextView) findViewById(R.id.Postcode);
 
-		pb = (PostcodeBackend) getLastNonConfigurationInstance();
-		if (pb == null)
-			pb = new PostcodeBackend();
-		newPostcode(false);
-
+		ps = (PostcodeState) getLastNonConfigurationInstance();
 		final Postcode self = this;
 		((Button) findViewById(R.id.btnUpdate)).setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
@@ -46,7 +54,17 @@ public class Postcode extends Activity implements PostcodeListener {
 	protected void onResume()
 	{
 		super.onResume();
-		newPostcode(false);
+		if (ps == null || ps.pb == null)
+			pb = new PostcodeBackend();
+		else
+			pb = ps.pb;
+		
+		if (ps == null
+				|| (new Date().getTime()-ps.timestamp.getTime()) > 300 * 1000 // more than 5 minutes old
+				)
+			newPostcode(false);
+		else
+			setText(ps.text);
 	}
 
 	public static void main(String[] args) throws Exception {
@@ -94,6 +112,10 @@ public class Postcode extends Activity implements PostcodeListener {
 	@Override
 	public Object onRetainNonConfigurationInstance()
 	{
-		return pb;
+		PostcodeState ps = new PostcodeState();
+		ps.pb = pb;
+		ps.text = tv.getText().toString();
+		ps.timestamp = new Date();
+		return ps;
 	}
 }
