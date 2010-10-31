@@ -14,6 +14,7 @@ import android.location.*;
 import android.os.Bundle;
 import android.content.Context;
 import android.util.Log;
+import android.os.Looper;
 
 public class PostcodeBackend implements LocationListener  {	
 	public static final String TAG = "PostcodeBackend";
@@ -167,21 +168,31 @@ public class PostcodeBackend implements LocationListener  {
 		
 		Log.d(TAG, "Acquiring postcode from location");
 		lm = (LocationManager)context.getSystemService(Context.LOCATION_SERVICE);
-		Criteria c = new Criteria();
 		Location l = null;
-		for(String provider: lm.getProviders(false))
+		for(final String provider: lm.getProviders(false))
 		{
 			if (l == null && !mustBeNew)
 			{
 				l = lm.getLastKnownLocation(provider);
-				if (l!=null && ((System.currentTimeMillis()-l.getTime())/1000.0) > 60) // > 1 minute old
+				if (l!=null && 
+					(((System.currentTimeMillis()-l.getTime())/1000.0) > 60 || // > 1 minute old
+					!l.hasAccuracy() || l.getAccuracy() > 200)) // want only items accurate to <200m
 				{
-					Log.d(TAG, "Got old data from "+provider);
+					Log.d(TAG, "Got old/crap data from "+provider);
 					l = null;
 				}
+				else
+					Log.d(TAG, "Got data from "+provider);
 			}
 			if (l == null)
-				lm.requestLocationUpdates(provider, 0, 0, this);
+			{
+				final LocationManager internal_lm = lm;
+				new Thread() { public void run() {
+					Looper.prepare();
+					internal_lm.requestLocationUpdates(provider, 0, 0, self);
+					Looper.loop();
+				}}.start();
+			}
 		}
 
 		plsLock.lock();
