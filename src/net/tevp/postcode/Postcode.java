@@ -73,7 +73,7 @@ public class Postcode extends Activity implements PostcodeListener {
 		System.out.println(PostcodeBackend.get(Double.parseDouble(coords[0]),Double.parseDouble(coords[1])));
 	}
 
-	private void setText(final String text)
+	private void setText(final CharSequence text)
 	{
 		final TextView myTV = tv;		
 		runOnUiThread(new Runnable()
@@ -88,7 +88,7 @@ public class Postcode extends Activity implements PostcodeListener {
 	public void postcodeChange(String postcode)
 	{
 		lastPostcode = postcode;
-		setText(postcode);
+		setText(String.format("%s\n(@ %s)", postcode, new SimpleDateFormat("HH:mm:ss").format(new Date())));
 	}
 
 	public void updatedLocation(Location l)
