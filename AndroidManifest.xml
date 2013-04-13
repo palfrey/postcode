@@ -29,10 +29,6 @@
                     android:resource="@xml/postcode_appwidget_info"/>
         </receiver>
 
-        <service
-                android:enabled="true"
-                android:singleUser="true"
-                android:name=".PostcodeAppWidgetProvider$UpdateService"/>
     </application>
 
 

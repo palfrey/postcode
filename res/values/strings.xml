@@ -2,4 +2,5 @@
 <resources>
     
     <string name="app_name">Postcode</string>
+    <string name="nopostcode">--- ---</string>
 </resources>
