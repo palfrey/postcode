@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+        <shape
+                android:shape="ring"
+                android:innerRadius="0dp"
+                android:thickness="20dp"
+                android:useLevel="false">
+            <stroke
+                    android:color="@android:color/white"
+                    android:width="3dp"/>
+        </shape>
+    </item>
+
+    <item>
+        <bitmap
+                android:src="@android:drawable/stat_notify_sync"
+                android:gravity="center"/>
+    </item>
+</layer-list>
