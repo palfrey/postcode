@@ -1,17 +1,18 @@
 package net.tevp.postcode;
 
+import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.Intent;
 import android.location.Location;
 import android.widget.RemoteViews;
 
 import java.text.DateFormat;
 
 /**
- * TODO: Add in the pending intents to handle, click to start the main app, click on accuracy to refresh
- * TODO: Handle size changes to show extras  - and persist post code  / location
+ *
  */
 public class PostcodeAppWidgetProvider extends AppWidgetProvider implements PostcodeListener {
 
@@ -23,35 +24,53 @@ public class PostcodeAppWidgetProvider extends AppWidgetProvider implements Post
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
         pb.getPostcode(context, this, true);
         this.context = context;
+        lastLocation = null;
+        postcodeChange(context.getString(R.string.locating));
     }
 
     @Override
     public void postcodeChange(final String postcode) {
-        RemoteViews views = buildRemoteViews(context,postcode);
-        AppWidgetManager manager = AppWidgetManager.getInstance(context);
-        ComponentName thisWidget = new ComponentName(context, PostcodeAppWidgetProvider.class);
+        final ComponentName thisWidget = new ComponentName(context, PostcodeAppWidgetProvider.class);
+        final AppWidgetManager manager = AppWidgetManager.getInstance(context);
+        final RemoteViews views = buildRemoteViews(context,postcode);
+        views.setOnClickPendingIntent(R.id.refresh, createUpdatePendingIntent(manager.getAppWidgetIds(thisWidget)));
+        views.setOnClickPendingIntent(R.id.postcodewidget,PendingIntent.getActivity(context,0,new Intent(context,Postcode.class),0));
         manager.updateAppWidget(thisWidget, views);
+    }
+
+    private PendingIntent createUpdatePendingIntent(final int[] widgetIds)
+    {
+        final Intent update = new Intent(context,PostcodeAppWidgetProvider.class);
+        update.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, widgetIds);
+        update.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
+        return PendingIntent.getBroadcast(context,0,update,0);
     }
 
     @Override
     public void updatedLocation(final Location l) {
         lastLocation = l;
+        postcodeChange(context.getString(R.string.updating));
     }
 
     @Override
     public void locationFindFail() {
+        postcodeChange(pb.lastPostcode);
+        lastLocation = pb.last;
     }
 
     @Override
     public void postcodeLookupFail() {
+        postcodeChange(context.getString(R.string.lookup_fail));
+        lastLocation = null;
     }
 
     private RemoteViews buildRemoteViews(final Context context,final String postCode) {
         final RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.appwidget);
         views.setTextViewText(R.id.postcode, postCode);
-        views.setTextViewText(R.id.accuracy, Integer.toString((int) lastLocation.getAccuracy()));
-        views.setTextViewText(R.id.location, String.format("%2.2f / %2.2f", lastLocation.getLatitude(),lastLocation.getLongitude()));
-        views.setTextViewText(R.id.time, DateFormat.getTimeInstance().format(lastLocation.getTime()));
+        if(lastLocation!=null)
+        {
+            views.setTextViewText(R.id.time, DateFormat.getTimeInstance(DateFormat.SHORT).format(lastLocation.getTime()));
+        }
         return views;
     }
 }
