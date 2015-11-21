@@ -16,24 +16,23 @@ import android.content.Context;
 import android.util.Log;
 import android.os.Looper;
 
-public class PostcodeBackend implements LocationListener  {	
+public class PostcodeBackend implements LocationListener  {
 	public static final String TAG = "PostcodeBackend";
-    static Geohash e = new Geohash();
 	Location last = null;
 	static Timer timer = new Timer(true);
 	TimerTask ttLocator = null;
-    
+
 	private static String grabURL(String url) throws PostcodeException
 	{
 		URL what;
-		try {			
+		try {
 			what = new URL(url);
 		} catch (MalformedURLException e1) {
 			throw new PostcodeException("Malformed for"+url, e1);
 		}
 		InputStream data;
 		int max = 1000, sofar=0;
-		
+
 		byte[] out = new byte[max];
 		try {
 			data = what.openStream();
@@ -46,9 +45,8 @@ public class PostcodeBackend implements LocationListener  {
 				sofar += ret;
 			}
 		} catch (IOException e1) {
-			throw new PostcodeException("IOException during url grab", e1);
+			throw new PostcodeException("IOException during url grab of " + url, e1);
 		}
-
 		return new String(out, 0, sofar);
 	}
 
@@ -75,7 +73,7 @@ public class PostcodeBackend implements LocationListener  {
 		if (definitelyNotInUK(lat, lon))
 			throw new NonUKLocation();
 		String data = grabURL(String.format("http://www.uk-postcodes.com/latlng/%.8f,%.8f.json",lat,lon));
-		try 
+		try
 		{
 			JSONObject js = new JSONObject(data);
 			return js.getString("postcode");
@@ -85,21 +83,26 @@ public class PostcodeBackend implements LocationListener  {
 		}
 	}
 
-	private static String getWhatIsMyPostcode(double lat, double lon) throws PostcodeException
+	private static String getPostcodesIO(double lat, double lon) throws PostcodeException
 	{
 		if (definitelyNotInUK(lat, lon))
 			throw new NonUKLocation();
-		String s = e.encode(lat, lon);
-		String data = grabURL("http://whatismypostcode.appspot.com/"+s);
-		if (data.compareTo("Unknown location")==0)
-			throw new PostcodeException("unknown location");
-		return data;
+		String data = grabURL(String.format("http://api.postcodes.io/postcodes?lon=%.8f&lat=%.8f&limit=1", lon,lat));
+		try
+		{
+			JSONObject js = new JSONObject(data);
+			return js.getJSONArray("result").getJSONObject(0).getString("postcode");
+		}
+		catch (JSONException e) {
+			System.out.println(e);
+			throw new PostcodeException("json issue", e);
+		}
 	}
 
 	private static String getGeonames(double lat, double lon) throws PostcodeException
 	{
 		String data = grabURL(String.format("http://ws.geonames.org/findNearbyPostalCodesJSON?lat=%.8f&lng=%.8f&maxRows=1",lat,lon));
-		try 
+		try
 		{
 			JSONObject js = new JSONObject(data);
 			return js.getJSONArray("postalCodes").getJSONObject(0).getString("postalCode");
@@ -120,7 +123,7 @@ public class PostcodeBackend implements LocationListener  {
 				switch (i)
 				{
 					case 0:
-						return getWhatIsMyPostcode(lat,lon);
+						return getPostcodesIO(lat,lon);
 					case 1:
 						return getGeonames(lat,lon);
 					case 2:
@@ -171,9 +174,9 @@ public class PostcodeBackend implements LocationListener  {
 					pl.locationFindFail();
 			}
 		};
-		
+
 		timer.schedule(ttLocator, 1000 * 60); // 1 minute before we give up
-		
+
 		Log.d(TAG, "Acquiring postcode from location");
 		lm = (LocationManager)context.getSystemService(Context.LOCATION_SERVICE);
 		Location l = null;
@@ -182,7 +185,7 @@ public class PostcodeBackend implements LocationListener  {
 			if (l == null && !mustBeNew)
 			{
 				l = lm.getLastKnownLocation(provider);
-				if (l!=null && 
+				if (l!=null &&
 					(((System.currentTimeMillis()-l.getTime())/1000.0) > 60 || // > 1 minute old
 					!l.hasAccuracy() || l.getAccuracy() > 200)) // want only items accurate to <200m
 				{
@@ -214,7 +217,7 @@ public class PostcodeBackend implements LocationListener  {
 		{
 			plsLock.unlock();
 		}
-			
+
 		if (l!= null)
 		{
 			final Location l2 = l;
@@ -296,4 +299,3 @@ public class PostcodeBackend implements LocationListener  {
 		System.out.println(new PostcodeBackend().get(Double.valueOf(args[0]), Double.valueOf(args[1])));
 	}
 }
-
