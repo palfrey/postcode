@@ -1,16 +1,22 @@
 buildscript {
-    repositories {
-        jcenter()
-    }
+	repositories {
+		jcenter()
+	}
 
-    dependencies {
-        classpath 'com.android.tools.build:gradle:1.5.0'
-    }
+	dependencies {
+		classpath 'com.android.tools.build:gradle:1.5.0'
+	}
 }
 
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 19
-    buildToolsVersion "19.1.0"
+	compileSdkVersion 19
+	buildToolsVersion "19.1.0"
+}
+
+task(runTest, dependsOn: 'assembleDebug', type: JavaExec) {
+	main = 'net.tevp.postcode.PostcodeBackend'
+	classpath = files( 'build/intermediates/classes/release/', 'json.jar', System.getenv('ANDROID_HOME') + '/platforms/android-19/android.jar')
+	args '42.569261', '-71.268311'
 }
