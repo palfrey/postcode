@@ -1,9 +1,7 @@
-bin
-gen
 *.apk
-.*.swp
-classes.dex
-bin-stamp
 .debug.keystore
 R.java
 postcode.keystore
+gradle
+.gradle
+build
