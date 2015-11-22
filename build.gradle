@@ -64,6 +64,6 @@ deploygate {
 
 task(runTest, dependsOn: 'assembleDogfood', type: JavaExec) {
 	main = 'net.tevp.postcode.PostcodeBackend'
-	classpath = files( 'build/intermediates/classes/debug/', 'json.jar', System.getenv('ANDROID_HOME') + '/platforms/android-19/android.jar')
+	classpath = files( 'build/intermediates/classes/dogfood/debug/', 'json.jar', System.getenv('ANDROID_HOME') + '/platforms/android-19/android.jar')
 	args '51.5269721','-0.0836098'
 }
