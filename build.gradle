@@ -39,6 +39,7 @@ android {
     productFlavors {
         dogfood {
             versionName "DF-${gitSha()}"
+			buildToolsVersion "23.0.1"
         }
     }
 }
