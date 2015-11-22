@@ -2,6 +2,5 @@
 .debug.keystore
 R.java
 postcode.keystore
-gradle
 .gradle
 build
