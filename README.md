@@ -1,5 +1,7 @@
 Postcode app
 ------------
+Build status: [![Circle CI](https://circleci.com/gh/palfrey/postcode/tree/master.svg?style=svg)](https://circleci.com/gh/palfrey/postcode/tree/master)
+
 See http://www.lshift.net/blog/2010/09/26/android-postcode-app for more details
 
 Geohash.java and Base32.java are from http://code.google.com/p/geospatialweb/source/browse/trunk/geohash/src/
