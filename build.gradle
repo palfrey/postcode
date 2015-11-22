@@ -37,9 +37,17 @@ android {
 	}
 
     productFlavors {
+		production { }
         dogfood {
             versionName "DF-${gitSha()}"
 			buildToolsVersion "23.0.1"
+        }
+    }
+
+	variantFilter { variant ->
+        if (variant.buildType.name.equals('release')
+                && variant.getFlavors().get(0).name.equals('dogfood')) {
+            variant.setIgnore(true);
         }
     }
 }
