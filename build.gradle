@@ -13,6 +13,20 @@ apply plugin: 'com.android.application'
 android {
 	compileSdkVersion 19
 	buildToolsVersion "19.1.0"
+
+	signingConfigs {
+		release {
+			storeFile file("postcode.keystore")
+			storePassword "android"
+			keyAlias "mykey"
+			keyPassword "android"
+		}
+	}
+	buildTypes {
+		release {
+			signingConfig signingConfigs.release
+		}
+	}
 }
 
 task(runTest, dependsOn: 'assembleDebug', type: JavaExec) {
