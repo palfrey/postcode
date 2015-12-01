@@ -34,9 +34,9 @@ public class Postcode extends Activity implements PostcodeListener {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-		ctx = this;
+	ctx = this;
 
-		setContentView(R.layout.main);
+	setContentView(R.layout.main);
         tv = (TextView) findViewById(R.id.Postcode);
 
 		ps = (PostcodeState) getLastNonConfigurationInstance();
