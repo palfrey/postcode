@@ -19,6 +19,7 @@ public class Postcode extends Activity implements PostcodeListener {
 	String lastPostcode = null;
 	PostcodeState ps = null;
 	boolean acquiring = false;
+	public static Context ctx = null;
 
 	private class PostcodeState
 	{
@@ -33,7 +34,9 @@ public class Postcode extends Activity implements PostcodeListener {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.main);
+		ctx = this;
+
+		setContentView(R.layout.main);
         tv = (TextView) findViewById(R.id.Postcode);
 
 		ps = (PostcodeState) getLastNonConfigurationInstance();

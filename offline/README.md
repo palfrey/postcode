@@ -11,6 +11,6 @@ For example,
 ./mkdb.py Data/CSV
 ```
 
-And once it has finished, you will have a postcodes.db :)
+And once it has finished, you will have a postcodes.db :) Put this into /sdcard/postcodes.db and the offline backend should pick it up.
 
 This can then be used by the postcodes app to read off your postcode without an internet connection.
