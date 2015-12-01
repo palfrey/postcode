@@ -1,5 +1,6 @@
 package net.tevp.postcode;
 
+import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.io.IOException;
@@ -96,6 +97,8 @@ public class PostcodeBackend implements LocationListener  {
 	{
 		if (definitelyNotInUK(lat, lon))
 			throw new NonUKLocation();
+		if(!new File("/sdcard/postcodes.db").exists())
+			throw new PostcodeException("No offline db");
 		try {
 			SQLiteOpenHelper helper = new SQLiteOpenHelper(Postcode.ctx, "/sdcard/postcodes.db", null, 1) {
 				@Override
@@ -110,7 +113,7 @@ public class PostcodeBackend implements LocationListener  {
 			String postcode = "N/A";
 
 			c.moveToFirst();
-    		while (!c.isAfterLast()) {
+			while (!c.isAfterLast()) {
 				String thisCode = c.getString(0);
 				double latt = Double.parseDouble(c.getString(1)), lonn = Double.parseDouble(c.getString(2));
 				double theta = lon - lonn;
@@ -118,13 +121,15 @@ public class PostcodeBackend implements LocationListener  {
 				dist = Math.acos(dist);
 				dist = deg(dist);
 				//dist = dist * 60 * 1.1515;
-      			if(dist < distance) {
+				if(dist < distance) {
 					distance = dist;
 					postcode = thisCode;
 				}
-      			c.moveToNext();
-    		}
-    		c.close();
+				c.moveToNext();
+			}
+			c.close();
+			if(postcode.equals("N/A"))
+				throw new PostcodeException("No postcode found");
 			return postcode;
 		} catch(Exception e) {
 			throw new PostcodeException("offline db error", e);
