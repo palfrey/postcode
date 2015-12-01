@@ -2,7 +2,7 @@
 
 import sqlite3
 import sys, os
-import csv, glob
+import csv
 from math import sqrt, pi, sin, cos, tan, atan2 as arctan2
 
 # from http://www.hannahfry.co.uk/blog/2012/02/01/converting-british-national-grid-to-latitude-and-longitude-ii

@@ -13,7 +13,7 @@ This bit assumes you are running some variant of Linux. You may need to adapt it
 
 You will first need to fetch the data. Go to https://www.ordnancesurvey.co.uk/opendatadownload/products.html and scroll down to `OS Open Names` and make sure "Supply format" is CSV. Then Shift+Select all the items in the list from HP to TV to get all the data.
 
-You will get an email after filling the form out. Copy the contents of the email into a file `list` in this folder and fetch all the links into a folder.
+You will get an email after filling the form out. Copy the contents of the email into a file `list` in this folder and fetch all the links into a folder by doing something like this:
 
 ```
 mkdir Src
