@@ -1,7 +1,7 @@
 # Offline Postcode database by moosd
 ## Thanks to:
-Ordanance Survey - https://www.ordnancesurvey.co.uk/business-and-government/products/os-open-names.html
-Dr Fry - http://www.hannahfry.co.uk/blog/2012/02/01/converting-british-national-grid-to-latitude-and-longitude-ii
+- Ordanance Survey - https://www.ordnancesurvey.co.uk/business-and-government/products/os-open-names.html
+- Dr Fry - http://www.hannahfry.co.uk/blog/2012/02/01/converting-british-national-grid-to-latitude-and-longitude-ii
 
 ## How to use it
 Install the postcode.apk and copy postcodes.db to /sdcard/postcodes.db
