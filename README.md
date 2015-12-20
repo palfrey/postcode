@@ -4,9 +4,6 @@ Build status: [![Circle CI](https://circleci.com/gh/palfrey/postcode/tree/master
 
 See http://www.lshift.net/blog/2010/09/26/android-postcode-app for more details
 
-Geohash.java and Base32.java are from http://code.google.com/p/geospatialweb/source/browse/trunk/geohash/src/
-and are covered under the LGPL
-
 Icon is from http://www.flickr.com/photos/55935853@N00/3578698943/sizes/t/in/photostream/ and is under Attribution-ShareAlike 2.0 Creative Commons
 
 Everything else is under the AGPL3 (see LICENSE)
