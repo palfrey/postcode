@@ -1,14 +1,16 @@
 package net.tevp.postcode;
 
+import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.*;
 import java.util.concurrent.locks.ReentrantLock;
-import java.util.HashSet;
-import java.util.Timer;
-import java.util.TimerTask;
 
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
 import org.json.*;
 import android.location.*;
 import android.os.Bundle;
@@ -83,6 +85,57 @@ public class PostcodeBackend implements LocationListener  {
 		}
 	}
 
+	private static double rad(double deg) {
+		return (deg * Math.PI / 180.0);
+	}
+
+	private static double deg(double rad) {
+		return (rad * 180 / Math.PI);
+	}
+
+	public static String getOfflinePostcodes(double lat, double lon) throws PostcodeException
+	{
+		if (definitelyNotInUK(lat, lon))
+			throw new NonUKLocation();
+		if(!new File("/sdcard/postcodes.db").exists())
+			throw new PostcodeException("No offline db");
+		try {
+			SQLiteOpenHelper helper = new SQLiteOpenHelper(Postcode.ctx, "/sdcard/postcodes.db", null, 1) {
+				@Override
+				public void onCreate(SQLiteDatabase db) {
+				}
+				@Override
+				public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+				}
+			};
+			Cursor c = helper.getReadableDatabase().query("codes", new String[]{"postcode", "lat", "lon"}, "lat LIKE ? AND lon LIKE ?", new String[]{Double.toString(lat).substring(0, 5) + "%", Double.toString(lon).substring(0, 4) + "%"}, null, null, null);
+			double distance = 1000;
+			String postcode = "N/A";
+
+			c.moveToFirst();
+			while (!c.isAfterLast()) {
+				String thisCode = c.getString(0);
+				double latt = Double.parseDouble(c.getString(1)), lonn = Double.parseDouble(c.getString(2));
+				double theta = lon - lonn;
+				double dist = Math.sin(rad(lat)) * Math.sin(rad(latt)) + Math.cos(rad(lat)) * Math.cos(rad(latt)) * Math.cos(rad(theta));
+				dist = Math.acos(dist);
+				dist = deg(dist);
+				//dist = dist * 60 * 1.1515;
+				if(dist < distance) {
+					distance = dist;
+					postcode = thisCode;
+				}
+				c.moveToNext();
+			}
+			c.close();
+			if(postcode.equals("N/A"))
+				throw new PostcodeException("No postcode found");
+			return postcode;
+		} catch(Exception e) {
+			throw new PostcodeException("offline db error", e);
+		}
+	}
+
 	private static String getPostcodesIO(double lat, double lon) throws PostcodeException
 	{
 		if (definitelyNotInUK(lat, lon))
@@ -123,10 +176,12 @@ public class PostcodeBackend implements LocationListener  {
 				switch (i)
 				{
 					case 0:
-						return getPostcodesIO(lat,lon);
+						return getOfflinePostcodes(lat,lon);
 					case 1:
-						return getGeonames(lat,lon);
+						return getPostcodesIO(lat,lon);
 					case 2:
+						return getGeonames(lat,lon);
+					case 3:
 						return getUKPostcodes(lat,lon);
 					default:
 						break;
