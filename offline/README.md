@@ -4,9 +4,7 @@
 - Dr Fry - http://www.hannahfry.co.uk/blog/2012/02/01/converting-british-national-grid-to-latitude-and-longitude-ii
 
 ## How to use it
-Install the postcode.apk and copy postcodes.db to /sdcard/postcodes.db
-
-You can find both of these files in releases.
+Install the Postcode app, and create a postcodes.db as follows
 
 ## How to recreate your own database
 This bit assumes you are running some variant of Linux. You may need to adapt it if you are using Windows or Mac OSX.
@@ -38,4 +36,4 @@ To process this into a useful database, just run the following:
 
 And once it has finished, you will have a postcodes.db :) Put this into /sdcard/postcodes.db and the offline backend should pick it up.
 
-This can then be used by the postcodes app to read off your postcode without an internet connection.
+This can then be used by the Postcode app to read off your postcode without an internet connection.
