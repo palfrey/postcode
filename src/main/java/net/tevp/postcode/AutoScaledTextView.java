@@ -63,11 +63,12 @@ public class AutoScaledTextView extends TextView implements TextWatcher
 				Log.d(TAG, "using heightScale");
 			}
 			Log.d(TAG, String.format("Scale is %f, %f", scale, heightScale));
-			Log.d(TAG, String.format("Font size: old %f, new %f", getTextSize(), getTextSize()*scale));
-			double fontdiff = Math.abs(getTextSize()-(getTextSize()*scale));
+			double newFontSize = Math.min(getTextSize()*scale, 70);
+			Log.d(TAG, String.format("Font size: old %f, new %f", getTextSize(), newFontSize));
+			double fontdiff = Math.abs(getTextSize()-newFontSize);
 			if (fontdiff<.5)
 				break;
-			setTextSize(Math.round(getTextSize()*scale));
+			setTextSize(Math.round(newFontSize));
 			requestLayout();
 			attempts +=1;
 			if (attempts > 5)
