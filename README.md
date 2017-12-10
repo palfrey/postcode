@@ -14,7 +14,7 @@ Everything else is under the AGPL3 (see [LICENSE](LICENSE))
       alt="Get it on F-Droid"
       height="90">](https://f-droid.org/packages/net.tevp.postcode/)
 [<img src="https://play.google.com/intl/en_us/badges/images/generic/en-play-badge.png"
-      alt="Get it on F-Droid"
+      alt="Get it on Google Play"
       height="90">](https://play.google.com/store/apps/details?id=net.tevp.postcode)
 
 ## Offline mode
