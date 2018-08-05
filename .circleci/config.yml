@@ -5,6 +5,16 @@ defaults: &defaults
   environment:
     TERM: xterm # Workaround for Gradle issues https://discuss.circleci.com/t/circleci-terminal-is-a-tty-but-term-is-not-set/9965/18
 
+dep_cache: &dep_cache
+  restore_cache:
+    keys:
+      # This branch if available
+      - v1-dep-{{ .Branch }}-
+      # Default branch if not
+      - v1-dep-master-
+      # Any branch if there are none on the default branch - this should be unnecessary if you have your default branch configured correctly
+      - v1-dep-
+
 version: 2
 jobs:
   build:
@@ -12,14 +22,7 @@ jobs:
     <<: *defaults
     steps:
     - checkout
-    - restore_cache:
-        keys:
-        # This branch if available
-        - v1-dep-{{ .Branch }}-
-        # Default branch if not
-        - v1-dep-master-
-        # Any branch if there are none on the default branch - this should be unnecessary if you have your default branch configured correctly
-        - v1-dep-
+    - <<: *dep_cache
     - run: ./gradlew dependencies
     # Save dependency cache
     - save_cache:
@@ -40,6 +43,7 @@ jobs:
     <<: *defaults
     steps:
       - checkout
+      - <<: *dep_cache
       - attach_workspace:
           at: .
       - run: ./gradlew uploadDeployGateDogfood
