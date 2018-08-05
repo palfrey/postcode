@@ -34,18 +34,12 @@ jobs:
     # Save test results
     - store_test_results:
         path: ./build/test-results
-    - persist_to_workspace:
-        root: .
-        paths:
-          - build/*
 
   deploy:
     <<: *defaults
     steps:
       - checkout
       - <<: *dep_cache
-      - attach_workspace:
-          at: .
       - run: ./gradlew assembleDogfood uploadDeployGateDogfood
 
 workflows:
