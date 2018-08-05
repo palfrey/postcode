@@ -1,26 +1,31 @@
 buildscript {
 	repositories {
+		google()
 		jcenter()
 	}
 
 	dependencies {
-		classpath 'com.android.tools.build:gradle:1.5.0'
-		classpath 'com.deploygate:gradle:0.6.2'
+		classpath 'com.android.tools.build:gradle:3.1.0'
+		classpath 'com.deploygate:gradle:1.1.5'
 	}
 }
 apply plugin: 'deploygate'
 apply plugin: 'com.android.application'
 
+Properties properties = new Properties()
+properties.load(project.rootProject.file('local.properties').newDataInputStream())
+def sdkDir = properties.getProperty('sdk.dir')
+
 def gitSha() {
-    return 'git rev-parse --short HEAD'.execute().text.trim()
+	return 'git rev-parse --short HEAD'.execute().text.trim()
 }
 def gitLastCommit() {
-    return 'git log -1 --no-merges --pretty=oneline --abbrev-commit'.execute().text.trim()
+	return 'git log -1 --no-merges --pretty=oneline --abbrev-commit'.execute().text.trim()
 }
 
 android {
-	compileSdkVersion 19
-	buildToolsVersion "19.1.0"
+	compileSdkVersion 28
+	buildToolsVersion "28.0.1"
 
 	signingConfigs {
 		release {
@@ -36,34 +41,39 @@ android {
 		}
 	}
 
+	flavorDimensions "standard"
+
     productFlavors {
-		production { }
-        dogfood {
-            versionName "DF-${gitSha()}"
-			buildToolsVersion "23.0.1"
-        }
-    }
+		production {
+			dimension "standard"
+		}
+		dogfood {
+			dimension "standard"
+			versionName "DF-${gitSha()}"
+			buildToolsVersion "28.0.1"
+		}
+	}
 
 	variantFilter { variant ->
-        if (variant.buildType.name.equals('release')
-                && variant.getFlavors().get(0).name.equals('dogfood')) {
-            variant.setIgnore(true);
-        }
-    }
+		if (variant.buildType.name.equals('release')
+			&& variant.getFlavors().get(0).name.equals('dogfood')) {
+				variant.setIgnore(true);
+			}
+		}
 }
 
 deploygate {
-  userName = "palfrey"
-  token = System.getenv('DEPLOYGATE_KEY')
-  apks {
-    dogfood {
-      sourceFile = file("build/outputs/apk/postcode-dogfood-debug.apk")
-    }
-  }
+	userName = "palfrey"
+	token = System.getenv('DEPLOYGATE_KEY')
+	apks {
+		dogfood {
+			sourceFile = file("build/outputs/apk/postcode-dogfood-debug.apk")
+		}
+	}
 }
 
 task(runTest, dependsOn: 'assembleDogfood', type: JavaExec) {
 	main = 'net.tevp.postcode.PostcodeBackend'
-	classpath = files( 'build/intermediates/classes/dogfood/debug/', 'json.jar', System.getenv('ANDROID_HOME') + '/platforms/android-19/android.jar')
+	classpath = files( 'build/intermediates/classes/dogfood/debug/', 'json.jar', sdkDir + '/platforms/android-28/android.jar')
 	args '51.5269721','-0.0836098'
 }

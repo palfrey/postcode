@@ -8,3 +8,4 @@ build
 .idea/
 .project
 *.iml
+local.properties
