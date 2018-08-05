@@ -57,7 +57,7 @@ android {
 
 	flavorDimensions "standard"
 
-    productFlavors {
+	productFlavors {
 		production {
 			dimension "standard"
 		}
@@ -74,16 +74,6 @@ android {
 				variant.setIgnore(true);
 			}
 		}
-}
-
-deploygate {
-	userName = "palfrey"
-	token = System.getenv('DEPLOYGATE_KEY')
-	apks {
-		dogfood {
-			sourceFile = file("build/outputs/apk/postcode-dogfood-debug.apk")
-		}
-	}
 }
 
 task(runTest, dependsOn: 'assembleDogfood', type: JavaExec) {

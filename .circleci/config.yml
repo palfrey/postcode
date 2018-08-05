@@ -1,22 +1,28 @@
+defaults: &defaults
+  working_directory: /tmp/workspace
+  docker:
+    - image: circleci/android:api-28-alpha
+  environment:
+    TERM: dumb # Workaround for Gradle issues https://discuss.circleci.com/t/circleci-terminal-is-a-tty-but-term-is-not-set/9965/18
+
+dep_cache: &dep_cache
+  restore_cache:
+    keys:
+      # This branch if available
+      - v1-dep-{{ .Branch }}-
+      # Default branch if not
+      - v1-dep-master-
+      # Any branch if there are none on the default branch - this should be unnecessary if you have your default branch configured correctly
+      - v1-dep-
+
 version: 2
 jobs:
   build:
     parallelism: 1
-    shell: /bin/bash --login
-    docker:
-    - image: circleci/android:api-28-alpha
-    environment:
-      TERM: xterm # Workaround for Gradle issues https://discuss.circleci.com/t/circleci-terminal-is-a-tty-but-term-is-not-set/9965/18
+    <<: *defaults
     steps:
     - checkout
-    - restore_cache:
-        keys:
-        # This branch if available
-        - v1-dep-{{ .Branch }}-
-        # Default branch if not
-        - v1-dep-master-
-        # Any branch if there are none on the default branch - this should be unnecessary if you have your default branch configured correctly
-        - v1-dep-
+    - <<: *dep_cache
     - run: ./gradlew dependencies
     # Save dependency cache
     - save_cache:
@@ -28,3 +34,24 @@ jobs:
     # Save test results
     - store_test_results:
         path: ./build/test-results
+
+  deploy:
+    <<: *defaults
+    steps:
+      - checkout
+      - <<: *dep_cache
+      - run: ./gradlew assembleDogfood uploadDeployGateDogfood
+
+workflows:
+  version: 2
+  build-deploy:
+    jobs:
+      - build
+      - deploy:
+          requires:
+            - build
+          filters:
+            branches:
+              only:
+                - master
+                - deploy
