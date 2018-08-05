@@ -46,7 +46,7 @@ jobs:
       - <<: *dep_cache
       - attach_workspace:
           at: .
-      - run: ./gradlew uploadDeployGateDogfood
+      - run: ./gradlew assembleDogfood uploadDeployGateDogfood
 
 workflows:
   version: 2
