@@ -81,7 +81,7 @@ deploygate {
 	token = System.getenv('DEPLOYGATE_KEY')
 	apks {
 		dogfood {
-			sourceFile = file("build/outputs/apk/postcode-dogfood-debug.apk")
+			sourceFile = file("build/outputs/apk/dogfood/debug/postcode-dogfood-debug.apk")
 		}
 	}
 }
