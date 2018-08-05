@@ -28,3 +28,23 @@ jobs:
     # Save test results
     - store_test_results:
         path: ./build/test-results
+
+  deploy:
+    docker:
+      - image: circleci/android:api-28-alpha
+    steps:
+      - run: ./gradlew uploadDeployGateDogfood
+
+workflows:
+  version: 2
+  build-deploy:
+    jobs:
+      - build
+      - deploy:
+          requires:
+            - build
+          filters:
+            branches:
+              only:
+                - master
+                - deploy
