@@ -3,7 +3,7 @@ defaults: &defaults
   docker:
     - image: circleci/android:api-28-alpha
   environment:
-    TERM: xterm # Workaround for Gradle issues https://discuss.circleci.com/t/circleci-terminal-is-a-tty-but-term-is-not-set/9965/18
+    TERM: dumb # Workaround for Gradle issues https://discuss.circleci.com/t/circleci-terminal-is-a-tty-but-term-is-not-set/9965/18
 
 dep_cache: &dep_cache
   restore_cache:
