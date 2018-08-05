@@ -1,6 +1,7 @@
 package net.tevp.postcode;
 
 import android.app.Activity;
+import android.content.ClipData;
 import android.os.Bundle;
 import android.content.Context;
 import android.widget.TextView;
@@ -8,7 +9,7 @@ import android.location.Location;
 import android.widget.Button;
 import android.view.View;
 import android.widget.Toast;
-import android.text.ClipboardManager;
+import android.content.ClipboardManager;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -53,7 +54,7 @@ public class Postcode extends Activity implements PostcodeListener {
 				else
 				{
 					ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE); 
-					clipboard.setText(self.lastPostcode);
+					clipboard.setPrimaryClip(ClipData.newPlainText("Postcode", self.lastPostcode));
 					self.toastText("Copied postcode to clipboard");
 				}
 			}
