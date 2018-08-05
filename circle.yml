@@ -1,9 +1,0 @@
-test:
-  override:
-    - ./gradlew assembleDogfood test runTest
-
-deployment:
-  master:
-    branch: master
-    commands:
-      - ./gradlew uploadDeployGateDogfood

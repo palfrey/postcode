@@ -4,3 +4,8 @@ R.java
 postcode.keystore
 .gradle
 build
+.settings/
+.idea/
+.project
+*.iml
+local.properties
