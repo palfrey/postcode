@@ -1,12 +1,15 @@
+defaults: &defaults
+  working_directory: /tmp
+  docker:
+    - image: circleci/android:api-28-alpha
+  environment:
+    TERM: xterm # Workaround for Gradle issues https://discuss.circleci.com/t/circleci-terminal-is-a-tty-but-term-is-not-set/9965/18
+
 version: 2
 jobs:
   build:
     parallelism: 1
-    shell: /bin/bash --login
-    docker:
-    - image: circleci/android:api-28-alpha
-    environment:
-      TERM: xterm # Workaround for Gradle issues https://discuss.circleci.com/t/circleci-terminal-is-a-tty-but-term-is-not-set/9965/18
+    <<: *defaults
     steps:
     - checkout
     - restore_cache:
@@ -28,11 +31,17 @@ jobs:
     # Save test results
     - store_test_results:
         path: ./build/test-results
+    - persist_to_workspace:
+        root: .
+        paths:
+          - build/*
 
   deploy:
-    docker:
-      - image: circleci/android:api-28-alpha
+    <<: *defaults
     steps:
+      - checkout
+      - attach_workspace:
+          at: .
       - run: ./gradlew uploadDeployGateDogfood
 
 workflows:
