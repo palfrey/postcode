@@ -12,9 +12,15 @@ buildscript {
 apply plugin: 'deploygate'
 apply plugin: 'com.android.application'
 
-Properties properties = new Properties()
-properties.load(project.rootProject.file('local.properties').newDataInputStream())
-def sdkDir = properties.getProperty('sdk.dir')
+File lp = project.rootProject.file('local.properties')
+if (lp.exists()) {
+	Properties properties = new Properties()
+	properties.load(lp.newDataInputStream())
+	project.ext.set("sdkDir", properties.getProperty('sdk.dir'))
+}
+else {
+	project.ext.set("sdkDir", System.getenv("ANDROID_HOME"))
+}
 
 def gitSha() {
 	return 'git rev-parse --short HEAD'.execute().text.trim()
@@ -74,6 +80,6 @@ deploygate {
 
 task(runTest, dependsOn: 'assembleDogfood', type: JavaExec) {
 	main = 'net.tevp.postcode.PostcodeBackend'
-	classpath = files( 'build/intermediates/classes/dogfood/debug/', 'json.jar', sdkDir + '/platforms/android-28/android.jar')
+	classpath = files( 'build/intermediates/classes/dogfood/debug/', 'json.jar', project.sdkDir + '/platforms/android-28/android.jar')
 	args '51.5269721','-0.0836098'
 }
