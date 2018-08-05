@@ -76,16 +76,6 @@ android {
 		}
 }
 
-deploygate {
-	userName = "palfrey"
-	token = System.getenv('DEPLOYGATE_KEY')
-	apks {
-		dogfood {
-			sourceFile = file("build/outputs/apk/dogfood/debug/postcode-dogfood-debug.apk")
-		}
-	}
-}
-
 task(runTest, dependsOn: 'assembleDogfood', type: JavaExec) {
 	main = 'net.tevp.postcode.PostcodeBackend'
 	classpath = files( 'build/intermediates/classes/dogfood/debug/', 'json.jar', project.sdkDir + '/platforms/android-28/android.jar')
