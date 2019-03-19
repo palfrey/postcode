@@ -194,6 +194,7 @@ public class PostcodeBackend implements LocationListener  {
 			}
 			catch (PostcodeException pe)
 			{
+				System.out.printf("Failed to acquire postcode via case %d: %s\n", i, pe);
 				old = pe;
 				i++;
 			}
