@@ -39,7 +39,7 @@ def gitLastCommit() {
 
 android {
 	compileSdkVersion 28
-	buildToolsVersion "28.0.1"
+	buildToolsVersion "28.0.3"
 
 	signingConfigs {
 		release {
@@ -64,7 +64,7 @@ android {
 		dogfood {
 			dimension "standard"
 			versionName "DF-${gitSha()}"
-			buildToolsVersion "28.0.1"
+			buildToolsVersion "28.0.3"
 		}
 	}
 
