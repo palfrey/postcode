@@ -55,13 +55,13 @@ workflows:
               only:
                 - master
                 - deploy
-   monthly:
-     triggers:
-       - schedule:
-           cron: "0 0 1 * *"
-           filters:
-             branches:
-               only:
-                 - master
-     jobs:
-       - build
+  monthly:
+    triggers:
+      - schedule:
+          cron: "0 0 1 * *"
+          filters:
+            branches:
+              only:
+                - master
+    jobs:
+      - build
