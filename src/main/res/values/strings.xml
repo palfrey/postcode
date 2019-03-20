@@ -2,4 +2,7 @@
 <resources>
     
     <string name="app_name">Postcode</string>
+    <string name="locating">Locating</string>
+    <string name="updating">Updating</string>
+    <string name="lookup_fail">Lookup Failed</string>
 </resources>

@@ -9,6 +9,14 @@
 <category android:name="android.intent.category.LAUNCHER"></category>
 </intent-filter>
 </activity>
+        <receiver android:name="PostcodeAppWidgetProvider">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
+            </intent-filter>
+            <meta-data
+                    android:name="android.appwidget.provider"
+                    android:resource="@xml/postcode_appwidget_info"/>
+        </receiver>
 </application>
     <uses-sdk android:minSdkVersion="11" />
 
