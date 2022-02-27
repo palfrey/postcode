@@ -2,7 +2,7 @@
 
 Build status: [![Circle CI](https://circleci.com/gh/palfrey/postcode/tree/master.svg?style=svg)](https://circleci.com/gh/palfrey/postcode/tree/master)
 
-See http://www.lshift.net/blog/2010/09/26/android-postcode-app for more details
+See https://tevps.net/blog/2010/09/26/android-postcode-app/ for more details
 
 Icon is from http://www.flickr.com/photos/55935853@N00/3578698943/sizes/t/in/photostream/ and is under Attribution-ShareAlike 2.0 Creative Commons
 
